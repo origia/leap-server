@@ -5,7 +5,6 @@ statsPublisher  = require './stats-publisher'
 
 class LeapWSServer
   clients: {}
-  currentId: 0
 
   constructor: (options) ->
     @initialize options || {}
@@ -17,25 +16,28 @@ class LeapWSServer
   addClient: (client) ->
     if 'x-token' of client.upgradeReq.headers
       token = client.upgradeReq.headers['x-token']
-      id = @currentId++
-      logger.debug "client connected with id #{id}"
-      @clients[id] =
+      logger.debug "client connected with token #{token}"
+      if token of @clients
+        @clients[token].active = true
+        return
+      @clients[token] =
         connection: client
         token: token
-      client.on 'close', (=> @removeClient(id))
+        active: true
+      client.on 'close', (=> @removeClient(token))
       logger.debug 'connection completed'
     else
       logger.debug 'connection refused'
       client.close()
 
-  removeClient: (id) ->
-    logger.debug "client with id #{id} disconnected"
-    delete @clients[id]
+  removeClient: (token) ->
+    logger.debug "client with token #{token} disconnected"
+    @clients[token].active = false
 
   broadCast: (data) ->
     logger.debug 'publishing leap data to mobile device' if @clients.length > 0
     _.each @clients, (client) ->
-      client.connection.send JSON.stringify(data)
+      client.connection.send JSON.stringify(data) if client.active
 
   publishStats: (data) ->
     logger.debug 'publishing stats' if @clients.length > 0
