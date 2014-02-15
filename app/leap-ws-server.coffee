@@ -33,12 +33,12 @@ class LeapWSServer
     delete @clients[id]
 
   broadCast: (data) ->
-    logger.debug 'publishing leap data to mobile device'
+    logger.debug 'publishing leap data to mobile device' if @clients.length > 0
     _.each @clients, (client) ->
       client.connection.send JSON.stringify(data)
 
   publishStats: (data) ->
-    logger.debug 'publishing stats'
+    logger.debug 'publishing stats' if @clients.length > 0
     _.each @clients, (client) ->
       statsPublisher.postStats _.extend(data, token: client.token)
 
