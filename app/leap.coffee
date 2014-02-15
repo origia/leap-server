@@ -23,7 +23,7 @@ class LeapHandler
 
   handleFrame: (frame) ->
     if frame.valid && frame.pointables.length > 1
-      @trigger 'move'
+      @trigger 'move', frame
 
   connect: -> @controller.connect()
 
@@ -32,7 +32,7 @@ class LeapHandler
 
   trigger: (evtName, args...) ->
     return unless @_events[evtName]?
-    @_events[evtName](args)
+    @_events[evtName](args...)
 
 
 controller = new LeapHandler(new Leap.Controller())
