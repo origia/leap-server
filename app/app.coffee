@@ -1,7 +1,6 @@
-logger = require './logger'
-LeapHandler = require './leap'
+logger       = require './logger'
+LeapHandler  = require './leap'
 LeapWSServer = require './leap-ws-server'
-statsPublisher = require './stats-publisher'
 
 server = new LeapWSServer
   port: 8080
@@ -25,5 +24,5 @@ getData = (frame) ->
 leap.on 'move', (frame) ->
   data =
     relativePosition: getData(frame)
-  statsPublisher.postStats data
-  server.broadCast JSON.stringify(data)
+  server.broadCast data
+  server.publishStats data

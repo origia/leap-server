@@ -1,6 +1,6 @@
-_  = require 'underscore'
+_      = require 'underscore'
 logger = require './logger'
-Leap = require 'leapjs'
+Leap   = require 'leapjs'
 
 class LeapHandler
   _events:

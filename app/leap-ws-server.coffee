@@ -1,6 +1,7 @@
-_  = require 'underscore'
+_               = require 'underscore'
 WebSocketServer = require('ws').Server
-logger = require './logger'
+logger          = require './logger'
+statsPublisher  = require './stats-publisher'
 
 class LeapWSServer
   clients: {}
@@ -32,7 +33,14 @@ class LeapWSServer
     delete @clients[id]
 
   broadCast: (data) ->
+    logger.debug 'publishing leap data to mobile device'
     _.each @clients, (client) ->
-      client.connection.send data
+      client.connection.send JSON.stringify(data)
+
+  publishStats: (data) ->
+    logger.debug 'publishing stats'
+    _.each @clients, (client) ->
+      statsPublisher.postStats _.extend(data, token: client.token)
+
 
 module.exports = LeapWSServer
