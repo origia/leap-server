@@ -1,9 +1,12 @@
 logger = require './logger'
-leap = require './leap'
-LeapWSServer = require('./leap-ws-server')
+LeapHandler = require './leap'
+LeapWSServer = require './leap-ws-server'
+statsPublisher = require './stats-publisher'
 
 server = new LeapWSServer
   port: 8080
+
+leap = new LeapHandler
   minTimeInterval: 3000
 
 dir =
@@ -20,7 +23,7 @@ getData = (frame) ->
   up | left
 
 leap.on 'move', (frame) ->
-  logger.debug frame.dump()
   data =
     relativePosition: getData(frame)
+  statsPublisher.postStats data
   server.broadCast JSON.stringify(data)

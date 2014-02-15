@@ -6,7 +6,16 @@ class LeapHandler
   _events:
     'move': ->
 
-  constructor: (@controller) ->
+  controller: new Leap.Controller()
+  lastEventTime: 0
+
+  constructor: (options) ->
+    options ||= {}
+    @minTimeInterval = options.minTimeInterval || 0
+    @_initEvents()
+    @controller.connect() unless options.noAutoConnect
+
+  _initEvents: ->
     @controller.on 'connect', (=> @handleConnect())
     @controller.on 'deviceConnected', (=> @handleDeviceConnected())
     @controller.on 'deviceDisconnected', (=> @handleDeviceDisconnected())
@@ -31,11 +40,11 @@ class LeapHandler
     @_events[evtName] = handler
 
   trigger: (evtName, args...) ->
+    currentTime = new Date()
+    return unless currentTime - @lastEventTime > @minTimeInterval
+    @lastEventTime = currentTime
     return unless @_events[evtName]?
     @_events[evtName](args...)
 
 
-controller = new LeapHandler(new Leap.Controller())
-controller.connect()
-
-module.exports = controller
+module.exports = LeapHandler
