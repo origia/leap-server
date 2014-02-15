@@ -14,10 +14,18 @@ class LeapWSServer
     server.on 'connection', ((client) => @addClient(client))
 
   addClient: (client) ->
-    id = @currentId++
-    logger.debug "client connected with id #{id}"
-    @clients[id] = client
-    client.on 'close', (=> @removeClient(id))
+    if 'x-token' of client.upgradeReq.headers
+      token = client.upgradeReq.headers['x-token']
+      id = @currentId++
+      logger.debug "client connected with id #{id}"
+      @clients[id] =
+        connection: client
+        token: token
+      client.on 'close', (=> @removeClient(id))
+      logger.debug 'connection completed'
+    else
+      logger.debug 'connection refused'
+      client.close()
 
   removeClient: (id) ->
     logger.debug "client with id #{id} disconnected"
@@ -25,6 +33,6 @@ class LeapWSServer
 
   broadCast: (data) ->
     _.each @clients, (client) ->
-      client.send data
+      client.connection.send data
 
 module.exports = LeapWSServer
