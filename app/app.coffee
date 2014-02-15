@@ -1,10 +1,10 @@
-_  = require 'underscore'
+logger = require './logger'
 leap = require './leap'
-wsHandlers = require './ws-handlers'
 
 WebSocketServer = require('ws').Server
 
 wss = new WebSocketServer({port: 8080})
 
-_.each wsHandlers, (handler, evt) ->
-  wss.on evt, handler
+leap.on 'move', ->
+  logger.debug 'move event'
+

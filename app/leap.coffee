@@ -1,19 +1,41 @@
+_  = require 'underscore'
+logger = require './logger'
 Leap = require 'leapjs'
 
-controller = new Leap.Controller()
+class LeapHandler
+  _events:
+    'move': ->
 
-controller.on 'connect', ->
-  console.log 'connection done'
+  constructor: (@controller) ->
+    @controller.on 'connect', (=> @handleConnect())
+    @controller.on 'deviceConnected', (=> @handleDeviceConnected())
+    @controller.on 'deviceDisconnected', (=> @handleDeviceDisconnected())
+    @controller.on 'frame', ((frame) => @handleFrame(frame))
 
-controller.on 'deviceConnected', ->
-  console.log 'connected'
+  handleConnect: ->
+    logger.debug 'connection succeeded'
 
-controller.on 'deviceDisconnected', ->
-  console.log 'disconnected'
+  handleDeviceConnected: ->
+    logger.debug 'device connected'
 
-controller.on 'frame', (frame) ->
+  handleDeviceDisconnected: ->
+    logger.debug 'device disconnected'
+
+  handleFrame: (frame) ->
+    if frame.valid && frame.pointables.length > 1
+      @trigger 'move'
+
+  connect: -> @controller.connect()
+
+  on: (evtName, handler) ->
+    @_events[evtName] = handler
+
+  trigger: (evtName, args...) ->
+    return unless @_events[evtName]?
+    @_events[evtName](args)
 
 
+controller = new LeapHandler(new Leap.Controller())
 controller.connect()
 
-exports.leap = controller
+module.exports = controller
