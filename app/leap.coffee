@@ -22,13 +22,13 @@ class LeapHandler
     @controller.on 'frame', ((frame) => @handleFrame(frame))
 
   handleConnect: ->
-    logger.debug 'connection succeeded'
+    logger.debug 'leap connection succeeded'
 
   handleDeviceConnected: ->
-    logger.debug 'device connected'
+    logger.debug 'leap device connected'
 
   handleDeviceDisconnected: ->
-    logger.debug 'device disconnected'
+    logger.debug 'leap device disconnected'
 
   handleFrame: (frame) ->
     if frame.valid && frame.pointables.length > 1
