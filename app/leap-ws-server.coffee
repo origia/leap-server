@@ -19,11 +19,11 @@ class LeapWSServer
       logger.debug "client connected with token #{token}"
       if token of @clients
         @clients[token].active = true
-        return
-      @clients[token] =
-        connection: client
-        token: token
-        active: true
+      else
+        @clients[token] =
+          connection: client
+          token: token
+          active: true
       client.on 'close', (=> @removeClient(token))
       logger.debug 'connection completed'
     else
