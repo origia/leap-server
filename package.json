@@ -20,7 +20,8 @@
   "homepage": "https://github.com/tuvistavie/leap-server",
   "dependencies": {
     "leapjs": "~0.4.1",
-    "ws": "~0.4.31"
+    "ws": "~0.4.31",
+    "winston": "~0.7.2"
   },
   "devDependencies": {
     "grunt-contrib-coffee": "~0.10.0",

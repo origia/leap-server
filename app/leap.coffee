@@ -12,8 +12,7 @@ controller.on 'deviceDisconnected', ->
   console.log 'disconnected'
 
 controller.on 'frame', (frame) ->
-  if frame.id % 100 == 0
-    console.log frame.fingers
+
 
 controller.connect()
 
