@@ -1,5 +1,6 @@
 _               = require 'underscore'
-WebSocketServer = require('ws').Server
+WebSocket       = require('ws')
+WebSocketServer = WebSocket.Server
 logger          = require './logger'
 statsPublisher  = require './stats-publisher'
 
@@ -18,12 +19,11 @@ class LeapWSServer
       token = client.upgradeReq.headers['x-token']
       logger.debug "client connected with token #{token}"
       if token of @clients
-        @clients[token].active = true
+        @clients[token].connection = client
       else
         @clients[token] =
           connection: client
           token: token
-          active: true
       client.on 'close', (=> @removeClient(token))
       logger.debug 'connection completed'
     else
@@ -32,12 +32,12 @@ class LeapWSServer
 
   removeClient: (token) ->
     logger.debug "client with token #{token} disconnected"
-    @clients[token].active = false
 
   broadCast: (data) ->
     logger.debug 'publishing leap data to mobile device' if @clients.length > 0
     _.each @clients, (client) ->
-      client.connection.send JSON.stringify(data) if client.active
+      if client.readyState == WebSocket.OPEN
+        client.connection.send JSON.stringify(data)
 
   publishStats: (data) ->
     logger.debug 'publishing stats' if @clients.length > 0
