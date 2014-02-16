@@ -13,10 +13,13 @@ postStats = (data) ->
   logger.debug 'starting http request'
   options.headers =
     'Content-Length': data.length
-  req = http.request options, (res) ->
-    logger.debug "STATUS: #{res.statusCode}"
-  req.write data
-  req.end()
+  try
+    req = http.request options, (res) ->
+      logger.debug "STATUS: #{res.statusCode}"
+    req.write data
+    req.end()
+  catch e
+    logger.error e
 
 module.exports =
   postStats: postStats
